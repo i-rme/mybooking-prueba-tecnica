@@ -9,6 +9,7 @@
 The file prueba_tecnica.sql is a dump of the db to be used.
 
 You can setup the sqlite db by using ./init_db.rb
+(You must create an empty db folder)
 
 ## Preparing the environment
 ```
