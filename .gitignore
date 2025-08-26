@@ -3,3 +3,4 @@
 debug.txt
 .vscode
 .rspec_status
+*.sqlite3

@@ -3,11 +3,12 @@
 ## Prerequesites
 
 - Ruby 3.3.0
-- MySQL or MariaDB
 
 ## Database
 
 The file prueba_tecnica.sql is a dump of the db to be used.
+
+You can setup the sqlite db by using ./init_db.rb
 
 ## Preparing the environment
 ```
@@ -18,8 +19,8 @@ Create an .env file at project root with the following variables
 
 ```ruby
 COOKIE_SECRET="THE-COOKIE-SECRET"
-DATABASE_URL="mysql://user:password@host:port/prueba_tecnica?encoding=UTF-8-MB4"
-TEST_DATABASE_URL="mysql://user:password@host:port/prueba_tecnica_test?encoding=UTF-8-MB4"
+DATABASE_URL=sqlite://$(pwd)/db/development.sqlite3
+TEST_DATABASE_URL=sqlite://$(pwd)/db/test.sqlite3
 ```
 
 ## Running the application
