@@ -15,10 +15,10 @@ gem "dm-aggregates", git: "https://github.com/mybooking-es/dm-aggregates"
 gem "dm-constraints", git: "https://github.com/mybooking-es/dm-constraints"
 gem "dm-do-adapter", git: "https://github.com/mybooking-es/dm-do-adapter"
 gem "dm-migrations", git: "https://github.com/mybooking-es/dm-migrations"
-gem "dm-mysql-adapter", git: "https://github.com/mybooking-es/dm-mysql-adapter"
+#gem "dm-mysql-adapter", git: "https://github.com/mybooking-es/dm-mysql-adapter"
 gem "dm-transactions", git: "https://github.com/mybooking-es/dm-transactions"
 gem "data_objects", git: "https://github.com/mybooking-es/data_objects"
-gem "do_mysql","0.10.17", git: 'https://github.com/mybooking-es/do_mysql'
+#gem "do_mysql","0.10.17", git: 'https://github.com/mybooking-es/do_mysql'
 gem "dm-types", git: "https://github.com/mybooking-es/dm-types"
 gem "dm-serializer", git: "https://github.com/mybooking-es/dm-serializer"
 gem "dm-active_model", git: "https://github.com/mybooking-es/dm-active_model"

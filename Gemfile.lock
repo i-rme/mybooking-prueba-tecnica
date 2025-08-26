@@ -50,14 +50,6 @@ GIT
       dm-core (~> 1.2.0)
 
 GIT
-  remote: https://github.com/mybooking-es/dm-mysql-adapter
-  revision: 07c12d1c53ac6eccf9520b94821d69a718450f4f
-  specs:
-    dm-mysql-adapter (1.2.0)
-      dm-do-adapter (~> 1.2.0)
-      do_mysql (~> 0.10.6)
-
-GIT
   remote: https://github.com/mybooking-es/dm-serializer
   revision: 55fdd0f2f5043f0eb810adb87a0b54bd626575c1
   specs:
@@ -95,15 +87,6 @@ GIT
       multi_json (~> 1.0)
       stringex (~> 1.4)
       uuidtools (~> 2.1)
-
-GIT
-  remote: https://github.com/mybooking-es/do_mysql
-  revision: a7921458e059e0c1fb0767221585dac5f9064296
-  specs:
-    do_mysql (0.10.17)
-      bigdecimal
-      data_objects (= 0.10.17)
-      rake-compiler
 
 GIT
   remote: https://github.com/mybooking-es/do_sqlite3
@@ -210,9 +193,6 @@ GEM
       rack (~> 2.2, >= 2.2.4)
     rack-test (2.2.0)
       rack (>= 1.3)
-    rake (13.3.0)
-    rake-compiler (1.3.0)
-      rake
     rdoc (6.14.2)
       erb
       psych (>= 4.0.0)
@@ -295,7 +275,6 @@ DEPENDENCIES
   dm-core!
   dm-do-adapter!
   dm-migrations!
-  dm-mysql-adapter!
   dm-observer
   dm-rspec
   dm-serializer!
@@ -303,7 +282,6 @@ DEPENDENCIES
   dm-transactions!
   dm-types!
   dm-validations
-  do_mysql (= 0.10.17)!
   do_sqlite3 (= 0.10.17)!
   dotenv
   factory_bot
