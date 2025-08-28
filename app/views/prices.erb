@@ -1,2 +1,121 @@
 <h1>Prices page</h1>
 <p><%= @message %></p>
+
+    <div class="content">
+      <!-- Filtros -->
+      <div class="container">
+        <div class="row">
+          <form class="row g-3">
+            <div class="col-md-2">
+              <label for="rental_location" class="form-label">Sucursal</label>
+              <select name="rental_location" class="form-select">
+                <% @rental_locations.each do |location| %>
+                  <option value="<%= location[:id] %>"><%= location[:name] %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="rate_type" class="form-label">Tipo de tarifa</label>
+               <select name="rate_type" class="form-select">
+                <% @rate_types.each do |rate_type| %>
+                  <option value="<%= rate_type[:id] %>"><%= rate_type[:name] %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="season_definition_id" class="form-label">Grupo de temporadas</label>
+              <select name="season_definition_id" class="form-select">
+                <% @season_definitions.each do |season_def| %>
+                  <option value="<%= season_def[:id] %>"><%= season_def[:name] %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="season_id" class="form-label">Temporada</label>
+                <select name="season_id" class="form-select">
+                <% @seasons.each do |season| %>
+                  <option value="<%= season[:id] %>"><%= season[:name] %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="season_duration" class="form-label">Duración</label>
+              <select name="season_duration" class="form-select">
+                <option value="">Seleccione la unidad</option>
+                <option value="month">Meses</option>
+                <option value="days">Días</option>
+                <option value="hours">Horas</option>
+                <option value="minutes">Minutos</option>
+              </select>
+            </div>
+            <div class="col-md-1">
+              <button class="btn btn-primary w-100" style="margin-top: 32px;">Filtrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <hr>
+      <!-- Tabla con las tarifas -->
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <table id="prices_table" class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Categoría</th>
+                  <% @price_periods.each do |period| %>
+                    <th scope="col" class="text-right"><%= period %></th>
+                  <% end %>
+                </tr>
+              </thead>
+              <tbody>
+                <% @prices.each do |price_row| %>
+                  <tr>
+                    <th scope="row"><%= price_row[:category] %></th>
+                    <% price_row[:prices].each do |price| %>
+                      <td class="text-right"><%= price %></td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Acciones -->
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <button class="btn btn-secondary w-100">Importar</button>
+          </div>
+      </div> 
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/2.3.3/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.3/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+      $(document).ready(function() {
+        $('select[name="rental_location"]').select2({
+          theme: 'bootstrap-5'
+        });
+        $('select[name="rate_type"]').select2({
+          theme: 'bootstrap-5'
+        });
+        $('select[name="season_definition_id"]').select2({
+          theme: 'bootstrap-5'
+        });
+        $('select[name="season_id"]').select2({
+          theme: 'bootstrap-5'
+        });
+        $('#prices_table').dataTable({
+          paging: true,
+          searching: false,
+          info: true
+        });
+
+      });
+    </script>

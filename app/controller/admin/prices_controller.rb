@@ -15,7 +15,13 @@ module Controller
           @title = "Prices page"
 
           if result.success?
-            @message = result.data
+            @rental_locations = result.data.rental_locations
+            @rate_types = result.data.rate_types
+            @season_definitions = result.data.season_definitions
+            @seasons = result.data.seasons
+            @price_periods = result.data.price_periods
+            @prices = result.data.prices
+            @message = result.data.message
             erb :prices
           else
             @message = result.message
