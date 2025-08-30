@@ -42,11 +42,10 @@
             <div class="col-md-2">
               <label for="season_duration" class="form-label">Duración</label>
               <select name="season_duration" class="form-select">
-                <option value="">Seleccione la unidad</option>
-                <option value="month">Meses</option>
-                <option value="days">Días</option>
-                <option value="hours">Horas</option>
-                <option value="minutes">Minutos</option>
+                <option value="month" <%= 'selected' if @selected_duration == 'month' %>>Meses</option>
+                <option value="days" <%= 'selected' if @selected_duration == 'days' %>>Días</option>
+                <option value="hours" <%= 'selected' if @selected_duration == 'hours' %>>Horas</option>
+                <option value="minutes" <%= 'selected' if @selected_duration == 'minutes' %>>Minutos</option>
               </select>
             </div>
             <div class="col-md-1">
@@ -110,6 +109,9 @@
           theme: 'bootstrap-5'
         });
         $('select[name="season_id"]').select2({
+          theme: 'bootstrap-5'
+        });
+        $('select[name="season_duration"]').select2({
           theme: 'bootstrap-5'
         });
         $('#prices_table').dataTable({

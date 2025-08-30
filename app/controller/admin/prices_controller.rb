@@ -25,6 +25,7 @@ module Controller
             @selected_rate_type = result.data.selected_rate_type
             @selected_season_definition = result.data.selected_season_definition
             @selected_season = result.data.selected_season
+            @selected_duration = result.data.selected_duration
             @message = result.data.message
             erb :prices
           else

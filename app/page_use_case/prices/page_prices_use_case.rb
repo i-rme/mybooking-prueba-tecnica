@@ -51,7 +51,8 @@ module PageUseCase
           rental_location_name: filter_params[:rental_location_name],
           rate_type_name: filter_params[:rate_type_name],
           season_definition_id: filter_params[:season_definition_id],
-          season_id: filter_params[:season_id]
+          season_id: filter_params[:season_id],
+          time_measurement: filter_params[:time_measurement]
         )
 
         # Transform data to match expected format
@@ -69,6 +70,7 @@ module PageUseCase
           selected_rate_type: filter_params[:selected_rate_type],
           selected_season_definition: filter_params[:selected_season_definition],
           selected_season: filter_params[:selected_season],
+          selected_duration: filter_params[:selected_duration],
           message: "Precios cargados correctamente"
         )
 
@@ -133,8 +135,9 @@ module PageUseCase
         selected_rate_type = params[:rate_type] || ''
         selected_season_definition = params[:season_definition_id] || ''
         selected_season = params[:season_id] || ''
+        selected_duration = params[:season_duration] || ''
 
-        { valid: true, authorized: true, selected_rental_location: selected_rental_location, selected_rate_type: selected_rate_type, selected_season_definition: selected_season_definition, selected_season: selected_season }
+        { valid: true, authorized: true, selected_rental_location: selected_rental_location, selected_rate_type: selected_rate_type, selected_season_definition: selected_season_definition, selected_season: selected_season, selected_duration: selected_duration }
       end
 
       #
@@ -160,15 +163,26 @@ module PageUseCase
         season_definition_id = season_definition ? season_definition.id.to_s : '1'
         season_id = season ? season.id.to_s : '0'
 
+        # Map duration to time_measurement
+        time_measurement = case processed_params[:selected_duration]
+        when 'days' then 1
+        when 'month' then 0
+        when 'hours' then 2
+        when 'minutes' then 3
+        else nil
+        end
+
         {
           rental_location_name: rental_location_name,
           rate_type_name: rate_type_name,
           season_definition_id: season_definition_id,
           season_id: season_id,
+          time_measurement: time_measurement,
           selected_rental_location: processed_params[:selected_rental_location],
           selected_rate_type: processed_params[:selected_rate_type],
           selected_season_definition: processed_params[:selected_season_definition],
-          selected_season: processed_params[:selected_season]
+          selected_season: processed_params[:selected_season],
+          selected_duration: processed_params[:selected_duration]
         }
       end
 

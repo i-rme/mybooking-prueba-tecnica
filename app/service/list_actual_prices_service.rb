@@ -1,7 +1,7 @@
 module Service
   class ListActualPricesService
 
-    def retrieve(rental_location_name: 'Barcelona', rate_type_name: 'Estándar', season_definition_id: '1', season_id: '0')
+    def retrieve(rental_location_name: 'Barcelona', rate_type_name: 'Estándar', season_definition_id: '1', season_id: '0', time_measurement: 1)
 
       sql = <<-SQL
         select p.id, p.price_definition_id, p.season_id, p.time_measurement, p.units,
@@ -20,12 +20,13 @@ module Service
         where rental_location_name = ? --sucursal
         and rate_type_name = ? --tipo de tarifa
         and sdrl.season_definition_id = ? -- grupo de temporadas
-        and p.season_id = ? -- temporada:
-        -- duracion falta
+        and p.season_id = ? -- temporada
+        and p.time_measurement = ? 
         order by rl.name, rt.name, c.code, s.name, p.units;
       SQL
 
-      Infraestructure::Query.run(sql, rental_location_name, rate_type_name, season_definition_id, season_id)
+      args = [rental_location_name, rate_type_name, season_definition_id, season_id, time_measurement]
+      Infraestructure::Query.run(sql, *args)
 
     end
 
