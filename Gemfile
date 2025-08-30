@@ -31,6 +31,7 @@ gem 'mutex_m'
 
 group :development do
   gem "dotenv"
+  gem 'rerun'
   gem 'rspec'
   gem 'rspec-its'
   gem 'factory_bot'
