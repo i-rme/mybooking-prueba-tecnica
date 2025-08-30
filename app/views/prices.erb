@@ -33,6 +33,7 @@
             <div class="col-md-2">
               <label for="season_id" class="form-label">Temporada</label>
                 <select name="season_id" class="form-select">
+                <option value="0" <%= 'selected' if @selected_season == '0' || @selected_season.empty? %>>Sin temporadas</option>
                 <% @seasons.each do |season| %>
                   <option value="<%= season[:id] %>" <%= 'selected' if season[:id].to_s == @selected_season %>><%= season[:name] %></option>
                 <% end %>
