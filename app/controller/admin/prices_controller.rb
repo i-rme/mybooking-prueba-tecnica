@@ -21,6 +21,10 @@ module Controller
             @seasons = result.data.seasons
             @price_periods = result.data.price_periods
             @prices = result.data.prices
+            @selected_rental_location = result.data.selected_rental_location
+            @selected_rate_type = result.data.selected_rate_type
+            @selected_season_definition = result.data.selected_season_definition
+            @selected_season = result.data.selected_season
             @message = result.data.message
             erb :prices
           else
