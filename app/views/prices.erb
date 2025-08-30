@@ -9,6 +9,7 @@
             <div class="col-md-2">
               <label for="rental_location" class="form-label">Sucursal</label>
               <select name="rental_location" class="form-select">
+                <option value="">Seleccione sucursal</option>
                 <% @rental_locations.each do |location| %>
                   <option value="<%= location[:id] %>" <%= 'selected' if location[:id].to_s == @selected_rental_location %>><%= location[:name] %></option>
                 <% end %>
@@ -16,7 +17,8 @@
             </div>
             <div class="col-md-2">
               <label for="rate_type" class="form-label">Tipo de tarifa</label>
-               <select name="rate_type" class="form-select">
+               <select name="rate_type" class="form-select" <%= 'disabled' if @selected_rental_location.to_s.empty? %>>
+                <option value="">Seleccione tipo de tarifa</option>
                 <% @rate_types.each do |rate_type| %>
                   <option value="<%= rate_type[:id] %>" <%= 'selected' if rate_type[:id].to_s == @selected_rate_type %>><%= rate_type[:name] %></option>
                 <% end %>
@@ -24,7 +26,8 @@
             </div>
             <div class="col-md-3">
               <label for="season_definition_id" class="form-label">Grupo de temporadas</label>
-              <select name="season_definition_id" class="form-select">
+              <select name="season_definition_id" class="form-select" <%= 'disabled' if @selected_rate_type.to_s.empty? %>>
+                <option value="">Seleccione grupo de temporadas</option>
                 <% @season_definitions.each do |season_def| %>
                   <option value="<%= season_def[:id] %>" <%= 'selected' if season_def[:id].to_s == @selected_season_definition %>><%= season_def[:name] %></option>
                 <% end %>
@@ -32,8 +35,9 @@
             </div>
             <div class="col-md-2">
               <label for="season_id" class="form-label">Temporada</label>
-                <select name="season_id" class="form-select">
-                <option value="0" <%= 'selected' if @selected_season == '0' || @selected_season.empty? %>>Sin temporadas</option>
+                <select name="season_id" class="form-select" <%= 'disabled' if @selected_season_definition.to_s.empty? %>>
+                <option value="">Seleccione temporada</option>
+                <option value="0" <%= 'selected' if @selected_season == '0' %>>Sin temporadas</option>
                 <% @seasons.each do |season| %>
                   <option value="<%= season[:id] %>" <%= 'selected' if season[:id].to_s == @selected_season %>><%= season[:name] %></option>
                 <% end %>
@@ -41,7 +45,8 @@
             </div>
             <div class="col-md-2">
               <label for="season_duration" class="form-label">Duración</label>
-              <select name="season_duration" class="form-select">
+              <select name="season_duration" class="form-select" <%= 'disabled' if @selected_season.to_s.empty? %>>
+                <option value="">Seleccione duración</option>
                 <option value="month" <%= 'selected' if @selected_duration == 'month' %>>Meses</option>
                 <option value="days" <%= 'selected' if @selected_duration == 'days' %>>Días</option>
                 <option value="hours" <%= 'selected' if @selected_duration == 'hours' %>>Horas</option>
@@ -49,7 +54,7 @@
               </select>
             </div>
             <div class="col-md-1">
-              <button class="btn btn-primary w-100" style="margin-top: 32px;">Filtrar</button>
+              <button class="btn btn-primary w-100" style="margin-top: 32px;" <%= 'disabled' if [@selected_rental_location, @selected_rate_type, @selected_season_definition, @selected_season].any? { |s| s.to_s.empty? } || @selected_duration.to_s.empty? %>>Filtrar</button>
             </div>
           </form>
         </div>
@@ -119,6 +124,77 @@
           searching: false,
           info: true
         });
+
+        function disableSubsequent(from) {
+          if (from === 'rental_location') {
+            $('select[name="rate_type"]').prop('disabled', true).trigger('change.select2');
+            disableSubsequent('rate_type');
+          } else if (from === 'rate_type') {
+            $('select[name="season_definition_id"]').prop('disabled', true).trigger('change.select2');
+            disableSubsequent('season_definition_id');
+          } else if (from === 'season_definition_id') {
+            $('select[name="season_id"]').prop('disabled', true).trigger('change.select2');
+            disableSubsequent('season_id');
+          } else if (from === 'season_id') {
+            $('select[name="season_duration"]').prop('disabled', true).trigger('change.select2');
+          }
+        }
+
+        $('select[name="rental_location"]').on('change', function() {
+          var val = $(this).val();
+          if (val) {
+            $('select[name="rate_type"]').prop('disabled', false).trigger('change.select2');
+          } else {
+            disableSubsequent('rental_location');
+          }
+          updateButton();
+        });
+
+        $('select[name="rate_type"]').on('change', function() {
+          var val = $(this).val();
+          if (val) {
+            $('select[name="season_definition_id"]').prop('disabled', false).trigger('change.select2');
+          } else {
+            disableSubsequent('rate_type');
+          }
+          updateButton();
+        });
+
+        $('select[name="season_definition_id"]').on('change', function() {
+          var val = $(this).val();
+          if (val) {
+            $('select[name="season_id"]').prop('disabled', false).trigger('change.select2');
+          } else {
+            disableSubsequent('season_definition_id');
+          }
+          updateButton();
+        });
+
+        $('select[name="season_id"]').on('change', function() {
+          var val = $(this).val();
+          if (val) {
+            $('select[name="season_duration"]').prop('disabled', false).trigger('change.select2');
+          } else {
+            disableSubsequent('season_id');
+          }
+          updateButton();
+        });
+
+        $('select[name="season_duration"]').on('change', function() {
+          updateButton();
+        });
+
+        function updateButton() {
+          var disabled = $('select[name="rental_location"]').is(':disabled') ||
+                          $('select[name="rate_type"]').is(':disabled') ||
+                          $('select[name="season_definition_id"]').is(':disabled') ||
+                          $('select[name="season_id"]').is(':disabled') ||
+                          $('select[name="season_duration"]').is(':disabled') ||
+                          $('select[name="season_duration"]').val() === '';
+          $('button:contains("Filtrar")').prop('disabled', disabled);
+        }
+
+        updateButton();
 
       });
     </script>
