@@ -38,41 +38,24 @@ module PageUseCase
           return Result.new(success?: true, authorized?: false, message: 'Not authorized')
         end
 
-        # Mock data
+        # Get data from services
+        rental_locations = Service::ListRentalLocationsService.new.retrieve
+        rate_types = Service::ListRateTypesService.new.retrieve
+        season_definitions = Service::ListSeasonDefinitionsService.new.retrieve
+        seasons = Service::ListSeasonsService.new.retrieve
+        actual_prices = Service::ListActualPricesService.new.retrieve
+
+        # Transform data to match expected format
+        price_periods = generate_price_periods(actual_prices)
+        formatted_prices = format_prices_by_category(actual_prices, price_periods)
+
         data = OpenStruct.new(
-          rental_locations: [
-            OpenStruct.new(id: 1, name: "Centro Madrid"),
-            OpenStruct.new(id: 2, name: "Aeropuerto Barajas"),
-            OpenStruct.new(id: 3, name: "Estación Atocha"),
-            OpenStruct.new(id: 4, name: "Plaza Castilla")
-          ],
-          rate_types: [
-            OpenStruct.new(id: 1, name: "Diaria"),
-            OpenStruct.new(id: 2, name: "Semanal"),
-            OpenStruct.new(id: 3, name: "Mensual"),
-            OpenStruct.new(id: 4, name: "Anual")
-          ],
-          season_definitions: [
-            OpenStruct.new(id: 1, name: "Temporada Alta"),
-            OpenStruct.new(id: 2, name: "Temporada Media"),
-            OpenStruct.new(id: 3, name: "Temporada Baja")
-          ],
-          seasons: [
-            OpenStruct.new(id: 1, name: "Verano 2024"),
-            OpenStruct.new(id: 2, name: "Invierno 2024"),
-            OpenStruct.new(id: 3, name: "Primavera 2024"),
-            OpenStruct.new(id: 4, name: "Otoño 2024")
-          ],
-          price_periods: [
-            "1 día", "2-3 días", "4-7 días", "8-15 días", "16-30 días", "31+ días"
-          ],
-          prices: [
-            OpenStruct.new(category: "Económico", prices: ["15.00€","13.50€","12.00€","10.50€","9.00€","8.00€"]),
-            OpenStruct.new(category: "Estándar",  prices: ["25.00€","22.50€","20.00€","17.50€","15.00€","13.00€"]),
-            OpenStruct.new(category: "Premium",   prices: ["35.00€","31.50€","28.00€","24.50€","21.00€","18.00€"]),
-            OpenStruct.new(category: "Lujo",      prices: ["50.00€","45.00€","40.00€","35.00€","30.00€","25.00€"]),
-            OpenStruct.new(category: "SUV",       prices: ["40.00€","36.00€","32.00€","28.00€","24.00€","20.00€"])
-          ],
+          rental_locations: rental_locations.map { |rl| OpenStruct.new(id: rl.id, name: rl.name) },
+          rate_types: rate_types.map { |rt| OpenStruct.new(id: rt.id, name: rt.name) },
+          season_definitions: season_definitions.map { |sd| OpenStruct.new(id: sd.id, name: sd.name) },
+          seasons: seasons.map { |s| OpenStruct.new(id: s.id, name: s.name) },
+          price_periods: price_periods,
+          prices: formatted_prices,
           message: "Precios cargados correctamente"
         )
 
@@ -82,6 +65,53 @@ module PageUseCase
       end
 
       private
+
+      #
+      # Generate price periods from actual prices data
+      #
+      # @param [Array] actual_prices
+      # @return [Array] Array of period strings
+      #
+      def generate_price_periods(actual_prices)
+        units = actual_prices.map { |p| p.units }.uniq.sort
+        units.map do |unit|
+          case unit
+          when 1 then "1 día"
+          when 2 then "2 días"
+          when 4 then "4 días"
+          when 8 then "8 días"
+          when 15 then "15 días"
+          when 30 then "30 días"
+          else "#{unit} días"
+          end
+        end
+      end
+
+      #
+      # Format prices by category for display
+      #
+      # @param [Array] actual_prices
+      # @param [Array] price_periods
+      # @return [Array] Formatted prices by category
+      #
+      def format_prices_by_category(actual_prices, price_periods)
+        # Group prices by category
+        prices_by_category = actual_prices.group_by { |p| "#{p.category_code} - #{p.category_name}" }
+
+        prices_by_category.map do |category_key, category_prices|
+          # Get all unique units for this category
+          category_units = category_prices.map { |p| p.units }.uniq.sort
+
+          # Create price array matching the periods
+          price_values = price_periods.map do |period|
+            unit = period.match(/(\d+)/)[1].to_i
+            price_record = category_prices.find { |p| p.units == unit }
+            price_record ? format("%.2f€", price_record.price) : "0.00€"
+          end
+
+          OpenStruct.new(category: category_key, prices: price_values)
+        end
+      end
 
       #
       # Process the parameters
