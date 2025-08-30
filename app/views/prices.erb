@@ -5,12 +5,12 @@
       <!-- Filtros -->
       <div class="container">
         <div class="row">
-          <form class="row g-3">
+          <form class="row g-3" method="get">
             <div class="col-md-2">
               <label for="rental_location" class="form-label">Sucursal</label>
               <select name="rental_location" class="form-select">
                 <% @rental_locations.each do |location| %>
-                  <option value="<%= location[:id] %>"><%= location[:name] %></option>
+                  <option value="<%= location[:id] %>" <%= 'selected' if location[:id].to_s == @selected_rental_location %>><%= location[:name] %></option>
                 <% end %>
               </select>
             </div>
@@ -18,7 +18,7 @@
               <label for="rate_type" class="form-label">Tipo de tarifa</label>
                <select name="rate_type" class="form-select">
                 <% @rate_types.each do |rate_type| %>
-                  <option value="<%= rate_type[:id] %>"><%= rate_type[:name] %></option>
+                  <option value="<%= rate_type[:id] %>" <%= 'selected' if rate_type[:id].to_s == @selected_rate_type %>><%= rate_type[:name] %></option>
                 <% end %>
               </select>
             </div>
@@ -26,7 +26,7 @@
               <label for="season_definition_id" class="form-label">Grupo de temporadas</label>
               <select name="season_definition_id" class="form-select">
                 <% @season_definitions.each do |season_def| %>
-                  <option value="<%= season_def[:id] %>"><%= season_def[:name] %></option>
+                  <option value="<%= season_def[:id] %>" <%= 'selected' if season_def[:id].to_s == @selected_season_definition %>><%= season_def[:name] %></option>
                 <% end %>
               </select>
             </div>
@@ -34,7 +34,7 @@
               <label for="season_id" class="form-label">Temporada</label>
                 <select name="season_id" class="form-select">
                 <% @seasons.each do |season| %>
-                  <option value="<%= season[:id] %>"><%= season[:name] %></option>
+                  <option value="<%= season[:id] %>" <%= 'selected' if season[:id].to_s == @selected_season %>><%= season[:name] %></option>
                 <% end %>
               </select>
             </div>
