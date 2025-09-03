@@ -4,28 +4,54 @@ module Service
     def retrieve(rental_location_name: 'Barcelona', rate_type_name: 'Estándar', season_definition_id: 1, season_id: 0, time_measurement: 1)
 
       sql = <<-SQL
-        select p.id, p.price_definition_id, p.season_id, p.time_measurement, p.units,
-                  p.price, p.included_km, p.extra_km_price,
-                  s.name as season_name,
-                  c.code as category_code, c.name as category_name,
-                  rl.name as rental_location_name,
-                  rt.name as rate_type_name
-            from prices p
-            left join seasons s on p.season_id = s.id
-            join category_rental_location_rate_types crlrt on p.id = crlrt.price_definition_id
-            join categories c on crlrt.category_id = c.id
-            join rental_locations rl on crlrt.rental_location_id = rl.id
-            join season_definition_rental_locations sdrl on rl.id = sdrl.rental_location_id
-            join rate_types rt on crlrt.rate_type_id = rt.id
-        where rental_location_name = ? --sucursal
-        and rate_type_name = ? --tipo de tarifa
-        and sdrl.season_definition_id = ? -- grupo de temporadas
-        and p.season_id = ?
-        and p.time_measurement = ? 
-        order by rl.name, rt.name, c.code, s.name, p.units;
+-- Parámetros: :rental_location_name, :rate_type_name, :season_definition_id, :season_id, :time_measurement
+-- Parámetros: :rental_location_name, :rate_type_name, :season_definition_id, :season_id, :time_measurement
+SELECT
+  c.code  AS category_code,
+  c.name  AS category_name,
+  rl.name AS rental_location_name,
+  rt.name AS rate_type_name,
+  COALESCE(s.name, 'Sin temporada') AS season_name,
+  p.time_measurement,
+  p.units,
+  p.price,
+  p.included_km,
+  p.extra_km_price,
+  pd.deposit,
+  pd.excess,
+  pd.id AS price_definition_id,
+  p.id  AS price_id
+FROM category_rental_location_rate_types crlrt
+JOIN price_definitions pd  ON pd.id = crlrt.price_definition_id
+JOIN prices p              ON p.price_definition_id = pd.id
+LEFT JOIN seasons s        ON s.id = p.season_id
+JOIN categories c          ON c.id = crlrt.category_id
+JOIN rental_locations rl   ON rl.id = crlrt.rental_location_id
+JOIN rate_types rt         ON rt.id = crlrt.rate_type_id
+LEFT JOIN season_definition_rental_locations sdrl
+  ON sdrl.rental_location_id = rl.id
+ AND sdrl.season_definition_id = COALESCE(pd.season_definition_id, s.season_definition_id)
+WHERE rl.name = ? -- rental_location_name
+  AND rt.name = ? -- rate_type_name
+  AND (
+        -- SIN temporada (compat: season_definition_id=0 y season_id=0)
+        (CAST(? AS UNSIGNED)=0 -- season_definition_id
+         AND pd.season_definition_id IS NULL
+         AND (p.season_id IS NULL OR CAST(? AS UNSIGNED)=0)) -- season_id
+
+        -- CON temporada (si season_id=0, trae TODAS; acepta pd.sd_id NULL si la season del precio pertenece al conjunto)
+        OR (CAST(? AS UNSIGNED)<>0 -- season_definition_id
+            AND COALESCE(pd.season_definition_id, s.season_definition_id) = CAST(? AS UNSIGNED) -- season_definition_id
+            AND (CAST(? AS UNSIGNED)=0 OR p.season_id = CAST(? AS UNSIGNED))) -- season_id, season_id
+      )
+  AND p.time_measurement = CASE CAST(? AS UNSIGNED) -- time_measurement
+                              WHEN 1 THEN 2   -- UI 1=días => BD 2
+                              ELSE CAST(? AS UNSIGNED) -- time_measurement
+                           END
+ORDER BY c.code, COALESCE(s.name,'ZZZ'), p.units;
       SQL
 
-      args = [rental_location_name, rate_type_name, season_definition_id, season_id, time_measurement]
+      args = [rental_location_name, rate_type_name, season_definition_id, season_id, season_definition_id, season_definition_id, season_id, season_id, time_measurement, time_measurement]
       Infraestructure::Query.run(sql, *args)
 
     end

@@ -8,8 +8,16 @@
   <a href="/prices">/prices</a>
 </p>
 <p>
+  <a href="/prices_spa">/prices_spa</a>
+</p>
+<p>
   <a href="/api/sample">/api/sample</a>
 </p>
 <p>
   <a href="/api/prices">/api/prices</a>
 </p>
+<pre>
+  <code>
+    curl -X POST -F "file=@example_prices.csv" http://localhost:9292/api/import-prices
+  </code>
+</pre>
