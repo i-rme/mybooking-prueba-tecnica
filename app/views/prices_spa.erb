@@ -287,19 +287,20 @@
             return;
           }
 
-          // Destroy existing DataTable first
+          // Destroy existing DataTable (this resets it to original state)
           if ($.fn.DataTable.isDataTable('#prices_table')) {
             $('#prices_table').DataTable().destroy();
-            // Clear DataTable classes and attributes
-            $('#prices_table').removeClass('dataTable').find('thead, tbody, tfoot').empty();
+            // Remove the manual emptying here to avoid interference
           }
 
-          // Update header
+          // Explicitly empty the header and body before repopulating
           $header.empty();
+          $body.empty();
+
+          // Update header
           $header.append('<th scope="col">Código Categoría</th><th scope="col">Nombre Categoría</th><th scope="col">Sucursal</th><th scope="col">Tipo de Tarifa</th><th scope="col">Temporada</th><th scope="col">Medida de Tiempo</th><th scope="col">Unidades</th><th scope="col">Precio</th><th scope="col">KM Incluidos</th><th scope="col">Precio Extra KM</th><th scope="col">Depósito</th><th scope="col">Exceso</th><th scope="col">ID Definición Precio</th><th scope="col">ID Precio</th>');
 
           // Update body
-          $body.empty();
           if (data.prices && data.prices.length > 0) {
             data.prices.forEach(function(price) {
               var row = '<tr>' +
@@ -320,23 +321,23 @@
                 '</tr>';
               $body.append(row);
             });
+
+            // Initialize DataTable AFTER content is added
+            try {
+              $('#prices_table').DataTable({
+                paging: true,
+                searching: false,
+                info: true,
+                destroy: true,
+                autoWidth: false
+              });
+            } catch (error) {
+              // Fallback to plain table if DataTable fails
+              $('#prices_table').addClass('table table-striped');
+            }
           } else {
             var colspan = 14;
             $body.append('<tr><td colspan="' + colspan + '" class="text-center">No hay datos disponibles</td></tr>');
-          }
-
-          // Initialize DataTable AFTER content is added
-          try {
-            $('#prices_table').dataTable({
-              paging: true,
-              searching: false,
-              info: true,
-              destroy: true,
-              autoWidth: false
-            });
-          } catch (error) {
-            // Fallback to plain table if DataTable fails
-            $('#prices_table').addClass('table table-striped');
           }
         }
 
