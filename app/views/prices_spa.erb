@@ -8,27 +8,18 @@
               <label for="rental_location" class="form-label">Sucursal</label>
               <select name="rental_location" class="form-select" id="rental_location">
                 <option value="">Seleccione sucursal</option>
-                <% @rental_locations.each do |location| %>
-                  <option value="<%= location[:id] %>" <%= 'selected' if location[:id].to_s == @selected_rental_location %>><%= location[:name] %></option>
-                <% end %>
               </select>
             </div>
             <div class="col-md-2">
               <label for="rate_type" class="form-label">Tipo de tarifa</label>
                <select name="rate_type" class="form-select" id="rate_type" disabled>
                 <option value="">Seleccione tipo de tarifa</option>
-                <% @rate_types.each do |rate_type| %>
-                  <option value="<%= rate_type[:id] %>" <%= 'selected' if rate_type[:id].to_s == @selected_rate_type %>><%= rate_type[:name] %></option>
-                <% end %>
               </select>
             </div>
             <div class="col-md-3">
               <label for="season_definition_id" class="form-label">Grupo de temporadas</label>
               <select name="season_definition_id" class="form-select" id="season_definition_id" disabled>
                 <option value="">Seleccione grupo de temporadas</option>
-                <% @season_definitions.each do |season_def| %>
-                  <option value="<%= season_def[:id] %>" <%= 'selected' if season_def[:id].to_s == @selected_season_definition %>><%= season_def[:name] %></option>
-                <% end %>
               </select>
             </div>
             <div class="col-md-2">
@@ -36,9 +27,6 @@
                 <select name="season_id" class="form-select" id="season_id" disabled>
                 <option value="">Seleccione temporada</option>
                 <option value="0">Sin temporadas</option>
-                <% @seasons.each do |season| %>
-                  <option value="<%= season[:id] %>" <%= 'selected' if season[:id].to_s == @selected_season %>><%= season[:name] %></option>
-                <% end %>
               </select>
             </div>
             <div class="col-md-2">
@@ -82,24 +70,6 @@
                 </tr>
               </thead>
               <tbody id="table_body">
-                <% @prices.each do |price| %>
-                  <tr>
-                    <td><%= price.category_code %></td>
-                    <td><%= price.category_name %></td>
-                    <td><%= price.rental_location_name %></td>
-                    <td><%= price.rate_type_name %></td>
-                    <td><%= price.season_name %></td>
-                    <td><%= price.time_measurement %></td>
-                    <td><%= price.units %></td>
-                    <td class="text-right"><%= price.price %></td>
-                    <td><%= price.included_km %></td>
-                    <td><%= price.extra_km_price %></td>
-                    <td><%= price.deposit %></td>
-                    <td><%= price.excess %></td>
-                    <td><%= price.price_definition_id %></td>
-                    <td><%= price.price_id %></td>
-                  </tr>
-                <% end %>
               </tbody>
             </table>
           </div>
