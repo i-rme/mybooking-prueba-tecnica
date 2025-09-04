@@ -57,11 +57,11 @@ module Controller
           if rental_location_id && rate_type_id && season_definition_id && season_id && duration
             # Map duration to time_measurement
             time_measurement = case duration
-            when 'days' then 1
+            when 'days' then 2
             when 'month' then 0
-            when 'hours' then 2
+            when 'hours' then 1
             when 'minutes' then 3
-            else 1
+            else nil
             end
 
             service = Service::ListActualPricesService.new

@@ -24,7 +24,7 @@ module UseCase
                           when 'days' then 2
                           when 'hours' then 1
                           when 'minutes' then 3
-                          else -1
+                          else nil
                           end
 
         actual_prices = Service::ListActualPricesService.new.retrieve(
