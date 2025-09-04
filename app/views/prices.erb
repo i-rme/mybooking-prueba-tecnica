@@ -65,19 +65,39 @@
             <table id="prices_table" class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Categoría</th>
-                  <% @price_periods.each do |period| %>
-                    <th scope="col" class="text-right"><%= period %></th>
-                  <% end %>
+                  <th scope="col">Código Categoría</th>
+                  <th scope="col">Nombre Categoría</th>
+                  <th scope="col">Sucursal</th>
+                  <th scope="col">Tipo de Tarifa</th>
+                  <th scope="col">Temporada</th>
+                  <th scope="col">Medida de Tiempo</th>
+                  <th scope="col">Unidades</th>
+                  <th scope="col">Precio</th>
+                  <th scope="col">KM Incluidos</th>
+                  <th scope="col">Precio Extra KM</th>
+                  <th scope="col">Depósito</th>
+                  <th scope="col">Exceso</th>
+                  <th scope="col">ID Definición Precio</th>
+                  <th scope="col">ID Precio</th>
                 </tr>
               </thead>
               <tbody>
-                <% @prices.each do |price_row| %>
+                <% @prices.each do |price| %>
                   <tr>
-                    <th scope="row"><%= price_row[:category] %></th>
-                    <% price_row[:prices].each do |price| %>
-                      <td class="text-right"><%= price %></td>
-                    <% end %>
+                    <td><%= price.category_code %></td>
+                    <td><%= price.category_name %></td>
+                    <td><%= price.rental_location_name %></td>
+                    <td><%= price.rate_type_name %></td>
+                    <td><%= price.season_name %></td>
+                    <td><%= price.time_measurement %></td>
+                    <td><%= price.units %></td>
+                    <td class="text-right"><%= price.price %></td>
+                    <td><%= price.included_km %></td>
+                    <td><%= price.extra_km_price %></td>
+                    <td><%= price.deposit %></td>
+                    <td><%= price.excess %></td>
+                    <td><%= price.price_definition_id %></td>
+                    <td><%= price.price_id %></td>
                   </tr>
                 <% end %>
               </tbody>

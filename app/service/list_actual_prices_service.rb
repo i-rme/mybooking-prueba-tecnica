@@ -1,11 +1,10 @@
 module Service
   class ListActualPricesService
 
-    def retrieve(rental_location_name: 'Barcelona', rate_type_name: 'Estándar', season_definition_id: 1, season_id: 0, time_measurement: 1)
+    def retrieve(rental_location_id: 1, rate_type_id: 1, season_definition_id: 1, season_id: 0, time_measurement: 1)
 
-      sql = <<-SQL
--- Parámetros: :rental_location_name, :rate_type_name, :season_definition_id, :season_id, :time_measurement
--- Parámetros: :rental_location_name, :rate_type_name, :season_definition_id, :season_id, :time_measurement
+sql = <<-SQL
+-- Parámetros: :rental_location_id, :rate_type_id, :season_definition_id, :season_id, :time_measurement
 SELECT
   c.code  AS category_code,
   c.name  AS category_name,
@@ -31,8 +30,8 @@ JOIN rate_types rt         ON rt.id = crlrt.rate_type_id
 LEFT JOIN season_definition_rental_locations sdrl
   ON sdrl.rental_location_id = rl.id
  AND sdrl.season_definition_id = COALESCE(pd.season_definition_id, s.season_definition_id)
-WHERE rl.name = ? -- rental_location_name
-  AND rt.name = ? -- rate_type_name
+WHERE rl.id = ? -- rental_location_id
+  AND rt.id = ? -- rate_type_id
   AND (
         -- SIN temporada (compat: season_definition_id=0 y season_id=0)
         (CAST(? AS UNSIGNED)=0 -- season_definition_id
@@ -42,7 +41,8 @@ WHERE rl.name = ? -- rental_location_name
         -- CON temporada (si season_id=0, trae TODAS; acepta pd.sd_id NULL si la season del precio pertenece al conjunto)
         OR (CAST(? AS UNSIGNED)<>0 -- season_definition_id
             AND COALESCE(pd.season_definition_id, s.season_definition_id) = CAST(? AS UNSIGNED) -- season_definition_id
-            AND (CAST(? AS UNSIGNED)=0 OR p.season_id = CAST(? AS UNSIGNED))) -- season_id, season_id
+            AND (CAST(? AS UNSIGNED)=0 OR p.season_id = CAST(? AS UNSIGNED)) -- season_id, season_id
+            AND sdrl.id IS NOT NULL) -- el conjunto de temporadas aplica en la sucursal
       )
   AND p.time_measurement = CASE CAST(? AS UNSIGNED) -- time_measurement
                               WHEN 1 THEN 2   -- UI 1=días => BD 2
@@ -51,8 +51,12 @@ WHERE rl.name = ? -- rental_location_name
 ORDER BY c.code, COALESCE(s.name,'ZZZ'), p.units;
       SQL
 
-      args = [rental_location_name, rate_type_name, season_definition_id, season_id, season_definition_id, season_definition_id, season_id, season_id, time_measurement, time_measurement]
-      Infraestructure::Query.run(sql, *args)
+      args = [rental_location_id, rate_type_id,
+              season_definition_id, season_id,
+              season_definition_id, season_definition_id,
+              season_id, season_id,
+              time_measurement, time_measurement]
+       Infraestructure::Query.run(sql, *args)
 
     end
 

@@ -45,27 +45,42 @@ module PageUseCase
         seasons = Service::ListSeasonsService.new.retrieve
 
         # Process params with the data
-        filter_params = process_filter_params(processed_params, rental_locations, rate_types, season_definitions, seasons)
+        filter_params = process_filter_params(processed_params)
 
         actual_prices = Service::ListActualPricesService.new.retrieve(
-          rental_location_name: filter_params[:rental_location_name],
-          rate_type_name: filter_params[:rate_type_name],
+          rental_location_id: filter_params[:rental_location_id],
+          rate_type_id: filter_params[:rate_type_id],
           season_definition_id: filter_params[:season_definition_id],
           season_id: filter_params[:season_id],
           time_measurement: filter_params[:time_measurement]
         )
 
         # Transform data to match expected format
-        price_periods = generate_price_periods(actual_prices)
-        formatted_prices = format_prices_by_category(actual_prices, price_periods)
+        prices = actual_prices.map do |p|
+          OpenStruct.new(
+            category_code: p.category_code,
+            category_name: p.category_name,
+            rental_location_name: p.rental_location_name,
+            rate_type_name: p.rate_type_name,
+            season_name: p.season_name,
+            time_measurement: p.time_measurement,
+            units: p.units,
+            price: format("%.2f€", p.price),
+            included_km: p.included_km,
+            extra_km_price: p.extra_km_price,
+            deposit: p.deposit,
+            excess: p.excess,
+            price_definition_id: p.price_definition_id,
+            price_id: p.price_id
+          )
+        end
 
         data = OpenStruct.new(
           rental_locations: rental_locations.map { |rl| OpenStruct.new(id: rl.id, name: rl.name) },
           rate_types: rate_types.map { |rt| OpenStruct.new(id: rt.id, name: rt.name) },
           season_definitions: season_definitions.map { |sd| OpenStruct.new(id: sd.id, name: sd.name) },
           seasons: seasons.map { |s| OpenStruct.new(id: s.id, name: s.name) },
-          price_periods: price_periods,
-          prices: formatted_prices,
+          prices: prices,
           selected_rental_location: filter_params[:selected_rental_location],
           selected_rate_type: filter_params[:selected_rate_type],
           selected_season_definition: filter_params[:selected_season_definition],
@@ -80,50 +95,6 @@ module PageUseCase
       end
 
       private
-
-      #
-      # Generate price periods from actual prices data
-      #
-      # @param [Array] actual_prices
-      # @return [Array] Array of period strings
-      #
-      def generate_price_periods(actual_prices)
-        units = actual_prices.map { |p| p.units }.uniq.sort
-        units.map do |unit|
-          case unit
-          when 1 then "1 día"
-          when 2 then "2 días"
-          when 4 then "4 días"
-          when 8 then "8 días"
-          when 15 then "15 días"
-          when 30 then "30 días"
-          else "#{unit} días"
-          end
-        end
-      end
-
-      #
-      # Format prices by category for display
-      #
-      # @param [Array] actual_prices
-      # @param [Array] price_periods
-      # @return [Array] Formatted prices by category
-      #
-      def format_prices_by_category(actual_prices, price_periods)
-        # Group prices by category
-        prices_by_category = actual_prices.group_by { |p| "#{p.category_code} - #{p.category_name}" }
-
-        prices_by_category.map do |category_key, category_prices|
-          # Create price array matching the periods
-          price_values = price_periods.map do |period|
-            unit = period.match(/(\d+)/)[1].to_i
-            price_record = category_prices.find { |p| p.units == unit }
-            price_record ? format("%.2f€", price_record.price) : "0.00€"
-          end
-
-          OpenStruct.new(category: category_key, prices: price_values)
-        end
-      end
 
       #
       # Process the parameters
@@ -150,18 +121,12 @@ module PageUseCase
       # @param [Array] seasons
       # @return [Hash]
       #
-      def process_filter_params(processed_params, rental_locations, rate_types, season_definitions, seasons)
-        # Find names from ids
-        rental_location = rental_locations.find { |rl| rl.id.to_s == processed_params[:selected_rental_location] }
-        rate_type = rate_types.find { |rt| rt.id.to_s == processed_params[:selected_rate_type] }
-        season_definition = season_definitions.find { |sd| sd.id.to_s == processed_params[:selected_season_definition] }
-        season = seasons.find { |s| s.id.to_s == processed_params[:selected_season] }
-
-        # Use names if found, else defaults
-        rental_location_name = rental_location ? rental_location.name : 'Barcelona'
-        rate_type_name = rate_type ? rate_type.name : 'Estándar'
-        season_definition_id = season_definition ? season_definition.id.to_s : '1'
-        season_id = season ? season.id.to_s : '0'
+      def process_filter_params(processed_params)
+        # Set defaults for ids
+        rental_location_id = processed_params[:selected_rental_location].empty? ? '1' : processed_params[:selected_rental_location]
+        rate_type_id = processed_params[:selected_rate_type].empty? ? '1' : processed_params[:selected_rate_type]
+        season_definition_id = processed_params[:selected_season_definition].empty? ? '1' : processed_params[:selected_season_definition]
+        season_id = processed_params[:selected_season].empty? ? '0' : processed_params[:selected_season]
 
         # Map duration to time_measurement
         time_measurement = case processed_params[:selected_duration]
@@ -173,8 +138,8 @@ module PageUseCase
         end
 
         {
-          rental_location_name: rental_location_name,
-          rate_type_name: rate_type_name,
+          rental_location_id: rental_location_id,
+          rate_type_id: rate_type_id,
           season_definition_id: season_definition_id,
           season_id: season_id,
           time_measurement: time_measurement,

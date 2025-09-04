@@ -55,44 +55,33 @@ module Controller
           duration = params[:duration]
 
           if rental_location_id && rate_type_id && season_definition_id && season_id && duration
-            # Get rental location and rate type names
-            rl_sql = "SELECT name FROM rental_locations WHERE id = ?"
-            rt_sql = "SELECT name FROM rate_types WHERE id = ?"
-            
-            rental_location = Infraestructure::Query.run(rl_sql, rental_location_id).first
-            rate_type = Infraestructure::Query.run(rt_sql, rate_type_id).first
-            
-            if rental_location && rate_type
-              # Map duration to time_measurement
-              time_measurement = case duration
-              when 'days' then 1
-              when 'month' then 0
-              when 'hours' then 2
-              when 'minutes' then 3
-              else 1
-              end
-
-              service = Service::ListActualPricesService.new
-              data = service.retrieve(
-                rental_location_name: rental_location.name,
-                rate_type_name: rate_type.name,
-                season_definition_id: season_definition_id,
-                season_id: season_id,
-                time_measurement: time_measurement
-              )
-
-              # Format the data similar to the page use case
-              price_periods = generate_price_periods(data)
-              formatted_prices = format_prices_by_category(data, price_periods)
-
-              content_type :json
-              {
-                price_periods: price_periods,
-                prices: formatted_prices.map { |p| { category: p.category, prices: p.prices } }
-              }.to_json
-            else
-              halt 400, { error: 'Invalid rental location or rate type' }.to_json
+            # Map duration to time_measurement
+            time_measurement = case duration
+            when 'days' then 1
+            when 'month' then 0
+            when 'hours' then 2
+            when 'minutes' then 3
+            else 1
             end
+
+            service = Service::ListActualPricesService.new
+            data = service.retrieve(
+              rental_location_id: rental_location_id,
+              rate_type_id: rate_type_id,
+              season_definition_id: season_definition_id,
+              season_id: season_id,
+              time_measurement: time_measurement
+            )
+
+            # Format the data similar to the page use case
+            price_periods = generate_price_periods(data)
+            formatted_prices = format_prices_by_category(data, price_periods)
+
+            content_type :json
+            {
+              price_periods: price_periods,
+              prices: formatted_prices.map { |p| { category: p.category, prices: p.prices } }
+            }.to_json
           else
             halt 400, { error: 'Missing required parameters' }.to_json
           end

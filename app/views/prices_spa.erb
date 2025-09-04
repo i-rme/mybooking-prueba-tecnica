@@ -65,19 +65,39 @@
             <table id="prices_table" class="table table-hover">
               <thead>
                 <tr id="table_header">
-                  <th scope="col">Categoría</th>
-                  <% @price_periods.each do |period| %>
-                    <th scope="col" class="text-right"><%= period %></th>
-                  <% end %>
+                  <th scope="col">Código Categoría</th>
+                  <th scope="col">Nombre Categoría</th>
+                  <th scope="col">Sucursal</th>
+                  <th scope="col">Tipo de Tarifa</th>
+                  <th scope="col">Temporada</th>
+                  <th scope="col">Medida de Tiempo</th>
+                  <th scope="col">Unidades</th>
+                  <th scope="col">Precio</th>
+                  <th scope="col">KM Incluidos</th>
+                  <th scope="col">Precio Extra KM</th>
+                  <th scope="col">Depósito</th>
+                  <th scope="col">Exceso</th>
+                  <th scope="col">ID Definición Precio</th>
+                  <th scope="col">ID Precio</th>
                 </tr>
               </thead>
               <tbody id="table_body">
-                <% @prices.each do |price_row| %>
+                <% @prices.each do |price| %>
                   <tr>
-                    <th scope="row"><%= price_row[:category] %></th>
-                    <% price_row[:prices].each do |price| %>
-                      <td class="text-right"><%= price %></td>
-                    <% end %>
+                    <td><%= price.category_code %></td>
+                    <td><%= price.category_name %></td>
+                    <td><%= price.rental_location_name %></td>
+                    <td><%= price.rate_type_name %></td>
+                    <td><%= price.season_name %></td>
+                    <td><%= price.time_measurement %></td>
+                    <td><%= price.units %></td>
+                    <td class="text-right"><%= price.price %></td>
+                    <td><%= price.included_km %></td>
+                    <td><%= price.extra_km_price %></td>
+                    <td><%= price.deposit %></td>
+                    <td><%= price.excess %></td>
+                    <td><%= price.price_definition_id %></td>
+                    <td><%= price.price_id %></td>
                   </tr>
                 <% end %>
               </tbody>
@@ -276,28 +296,32 @@
 
           // Update header
           $header.empty();
-          $header.append('<th scope="col">Categoría</th>');
-          if (data.price_periods && data.price_periods.length > 0) {
-            data.price_periods.forEach(function(period) {
-              $header.append('<th scope="col" class="text-right">' + period + '</th>');
-            });
-          }
+          $header.append('<th scope="col">Código Categoría</th><th scope="col">Nombre Categoría</th><th scope="col">Sucursal</th><th scope="col">Tipo de Tarifa</th><th scope="col">Temporada</th><th scope="col">Medida de Tiempo</th><th scope="col">Unidades</th><th scope="col">Precio</th><th scope="col">KM Incluidos</th><th scope="col">Precio Extra KM</th><th scope="col">Depósito</th><th scope="col">Exceso</th><th scope="col">ID Definición Precio</th><th scope="col">ID Precio</th>');
 
           // Update body
           $body.empty();
           if (data.prices && data.prices.length > 0) {
-            data.prices.forEach(function(priceRow) {
-              var row = '<tr><th scope="row">' + priceRow.category + '</th>';
-              if (priceRow.prices && priceRow.prices.length > 0) {
-                priceRow.prices.forEach(function(price) {
-                  row += '<td class="text-right">' + (price || '') + '</td>';
-                });
-              }
-              row += '</tr>';
+            data.prices.forEach(function(price) {
+              var row = '<tr>' +
+                '<td>' + price.category_code + '</td>' +
+                '<td>' + price.category_name + '</td>' +
+                '<td>' + price.rental_location_name + '</td>' +
+                '<td>' + price.rate_type_name + '</td>' +
+                '<td>' + price.season_name + '</td>' +
+                '<td>' + price.time_measurement + '</td>' +
+                '<td>' + price.units + '</td>' +
+                '<td class="text-right">' + price.price + '</td>' +
+                '<td>' + price.included_km + '</td>' +
+                '<td>' + price.extra_km_price + '</td>' +
+                '<td>' + price.deposit + '</td>' +
+                '<td>' + price.excess + '</td>' +
+                '<td>' + price.price_definition_id + '</td>' +
+                '<td>' + price.price_id + '</td>' +
+                '</tr>';
               $body.append(row);
             });
           } else {
-            var colspan = (data.price_periods ? data.price_periods.length : 0) + 1;
+            var colspan = 14;
             $body.append('<tr><td colspan="' + colspan + '" class="text-center">No hay datos disponibles</td></tr>');
           }
 
