@@ -21,8 +21,8 @@ module UseCase
 
         time_measurement = case duration
                           when 'month' then 0
-                          when 'days' then 1
-                          when 'hours' then 2
+                          when 'days' then 2
+                          when 'hours' then 1
                           when 'minutes' then 3
                           else -1
                           end

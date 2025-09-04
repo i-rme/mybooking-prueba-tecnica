@@ -130,9 +130,9 @@ module PageUseCase
 
         # Map duration to time_measurement
         time_measurement = case processed_params[:selected_duration]
-        when 'days' then 1
+        when 'days' then 2
         when 'month' then 0
-        when 'hours' then 2
+        when 'hours' then 1
         when 'minutes' then 3
         else nil
         end

@@ -44,10 +44,7 @@ WHERE rl.id = ? -- rental_location_id
             AND (CAST(? AS UNSIGNED)=0 OR p.season_id = CAST(? AS UNSIGNED)) -- season_id, season_id
             AND sdrl.id IS NOT NULL) -- el conjunto de temporadas aplica en la sucursal
       )
-  AND p.time_measurement = CASE CAST(? AS UNSIGNED) -- time_measurement
-                              WHEN 1 THEN 2   -- UI 1=días => BD 2
-                              ELSE CAST(? AS UNSIGNED) -- time_measurement
-                           END
+  AND p.time_measurement = ? -- time_measurement
 ORDER BY c.code, COALESCE(s.name,'ZZZ'), p.units;
       SQL
 
@@ -55,7 +52,7 @@ ORDER BY c.code, COALESCE(s.name,'ZZZ'), p.units;
               season_definition_id, season_id,
               season_definition_id, season_definition_id,
               season_id, season_id,
-              time_measurement, time_measurement]
+              time_measurement]
        Infraestructure::Query.run(sql, *args)
 
     end
