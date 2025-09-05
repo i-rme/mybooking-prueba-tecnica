@@ -1,58 +1,46 @@
-    <div class="content">
+<div class="content">
       <div class="container">
-        <h1>Prices page (SSR)</h1>
+        <h1>Prices page (SPA)</h1>
         <p><%= @message %></p>
         <div class="row">
-          <form class="row g-3" method="get">
+          <form class="row g-3">
             <div class="col-md-2">
               <label for="rental_location" class="form-label">Sucursal</label>
-              <select name="rental_location" class="form-select">
+              <select name="rental_location" class="form-select" id="rental_location">
                 <option value="">Seleccione sucursal</option>
-                <% @rental_locations.each do |location| %>
-                  <option value="<%= location[:id] %>" <%= 'selected' if location[:id].to_s == @selected_rental_location %>><%= location[:name] %></option>
-                <% end %>
               </select>
             </div>
             <div class="col-md-2">
               <label for="rate_type" class="form-label">Tipo de tarifa</label>
-               <select name="rate_type" class="form-select" <%= 'disabled' if @selected_rental_location.to_s.empty? %>>
+               <select name="rate_type" class="form-select" id="rate_type" disabled>
                 <option value="">Seleccione tipo de tarifa</option>
-                <% @rate_types.each do |rate_type| %>
-                  <option value="<%= rate_type[:id] %>" <%= 'selected' if rate_type[:id].to_s == @selected_rate_type %>><%= rate_type[:name] %></option>
-                <% end %>
               </select>
             </div>
             <div class="col-md-3">
               <label for="season_definition_id" class="form-label">Grupo de temporadas</label>
-              <select name="season_definition_id" class="form-select" <%= 'disabled' if @selected_rate_type.to_s.empty? %>>
+              <select name="season_definition_id" class="form-select" id="season_definition_id" disabled>
                 <option value="">Seleccione grupo de temporadas</option>
-                <% @season_definitions.each do |season_def| %>
-                  <option value="<%= season_def[:id] %>" <%= 'selected' if season_def[:id].to_s == @selected_season_definition %>><%= season_def[:name] %></option>
-                <% end %>
               </select>
             </div>
             <div class="col-md-2">
               <label for="season_id" class="form-label">Temporada</label>
-                <select name="season_id" class="form-select" <%= 'disabled' if @selected_season_definition.to_s.empty? %>>
+                <select name="season_id" class="form-select" id="season_id" disabled>
                 <option value="">Seleccione temporada</option>
-                <option value="0" <%= 'selected' if @selected_season == '0' %>>Sin temporadas</option>
-                <% @seasons.each do |season| %>
-                  <option value="<%= season[:id] %>" <%= 'selected' if season[:id].to_s == @selected_season %>><%= season[:name] %></option>
-                <% end %>
+                <option value="0">Sin temporadas</option>
               </select>
             </div>
             <div class="col-md-2">
               <label for="season_duration" class="form-label">Duración</label>
-              <select name="season_duration" class="form-select" <%= 'disabled' if @selected_season.to_s.empty? %>>
+              <select name="season_duration" class="form-select" id="season_duration" disabled>
                 <option value="">Seleccione duración</option>
-                <option value="month" <%= 'selected' if @selected_duration == 'month' %>>Meses</option>
-                <option value="days" <%= 'selected' if @selected_duration == 'days' %>>Días</option>
-                <option value="hours" <%= 'selected' if @selected_duration == 'hours' %>>Horas</option>
-                <option value="minutes" <%= 'selected' if @selected_duration == 'minutes' %>>Minutos</option>
+                <option value="month">Meses</option>
+                <option value="days">Días</option>
+                <option value="hours">Horas</option>
+                <option value="minutes">Minutos</option>
               </select>
             </div>
             <div class="col-md-1">
-              <button class="btn btn-primary w-100" style="margin-top: 32px;" <%= 'disabled' if [@selected_rental_location, @selected_rate_type, @selected_season_definition, @selected_season].any? { |s| s.to_s.empty? } || @selected_duration.to_s.empty? %>>Filtrar</button>
+              <button class="btn btn-primary w-100" style="margin-top: 32px;" id="filter_button" disabled>Filtrar</button>
             </div>
           </form>
         </div>
@@ -64,7 +52,7 @@
           <div class="col-12">
             <table id="prices_table" class="table table-hover">
               <thead>
-                <tr>
+                <tr id="table_header">
                   <th scope="col">Código Categoría</th>
                   <th scope="col">Nombre Categoría</th>
                   <th scope="col">Sucursal</th>
@@ -81,25 +69,7 @@
                   <th scope="col">ID Precio</th>
                 </tr>
               </thead>
-              <tbody>
-                <% @prices.each do |price| %>
-                  <tr>
-                    <td><%= price.category_code %></td>
-                    <td><%= price.category_name %></td>
-                    <td><%= price.rental_location_name %></td>
-                    <td><%= price.rate_type_name %></td>
-                    <td><%= price.season_name %></td>
-                    <td><%= price.time_measurement %></td>
-                    <td><%= price.units %></td>
-                    <td class="text-right"><%= price.price %></td>
-                    <td><%= price.included_km %></td>
-                    <td><%= price.extra_km_price %></td>
-                    <td><%= price.deposit %></td>
-                    <td><%= price.excess %></td>
-                    <td><%= price.price_definition_id %></td>
-                    <td><%= price.price_id %></td>
-                  </tr>
-                <% end %>
+              <tbody id="table_body">
               </tbody>
             </table>
           </div>
@@ -111,10 +81,10 @@
           <div class="col-12">
             <button class="btn btn-secondary w-100">Importar</button>
           </div>
-      </div> 
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/2.3.3/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.3/js/dataTables.bootstrap5.min.js"></script>
@@ -122,97 +92,225 @@
 
     <script>
       $(document).ready(function() {
-        $('select[name="rental_location"]').select2({
-          theme: 'bootstrap-5'
-        });
-        $('select[name="rate_type"]').select2({
-          theme: 'bootstrap-5'
-        });
-        $('select[name="season_definition_id"]').select2({
-          theme: 'bootstrap-5'
-        });
-        $('select[name="season_id"]').select2({
-          theme: 'bootstrap-5'
-        });
-        $('select[name="season_duration"]').select2({
-          theme: 'bootstrap-5'
-        });
-        $('#prices_table').dataTable({
-          paging: true,
-          searching: false,
-          info: true
-        });
+        // Initialize select2
+        $('#rental_location').select2({ theme: 'bootstrap-5' });
+        $('#rate_type').select2({ theme: 'bootstrap-5' });
+        $('#season_definition_id').select2({ theme: 'bootstrap-5' });
+        $('#season_id').select2({ theme: 'bootstrap-5' });
+        $('#season_duration').select2({ theme: 'bootstrap-5' });
 
-        function disableSubsequent(from) {
-          if (from === 'rental_location') {
-            $('select[name="rate_type"]').prop('disabled', true).trigger('change.select2');
-            disableSubsequent('rate_type');
-          } else if (from === 'rate_type') {
-            $('select[name="season_definition_id"]').prop('disabled', true).trigger('change.select2');
-            disableSubsequent('season_definition_id');
-          } else if (from === 'season_definition_id') {
-            $('select[name="season_id"]').prop('disabled', true).trigger('change.select2');
-            disableSubsequent('season_id');
-          } else if (from === 'season_id') {
-            $('select[name="season_duration"]').prop('disabled', true).trigger('change.select2');
-          }
-        }
+        // Load initial rental locations
+        loadRentalLocations();
 
-        $('select[name="rental_location"]').on('change', function() {
+        // Event handlers
+        $('#rental_location').on('change', function() {
           var val = $(this).val();
           if (val) {
-            $('select[name="rate_type"]').prop('disabled', false).trigger('change.select2');
+            loadRateTypes(val);
+            disableSubsequent('rental_location');
           } else {
+            clearSelect('#rate_type');
             disableSubsequent('rental_location');
           }
           updateButton();
         });
 
-        $('select[name="rate_type"]').on('change', function() {
+        $('#rate_type').on('change', function() {
+          var rentalLocationVal = $('#rental_location').val();
           var val = $(this).val();
-          if (val) {
-            $('select[name="season_definition_id"]').prop('disabled', false).trigger('change.select2');
+          if (val && rentalLocationVal) {
+            loadSeasonDefinitions(rentalLocationVal, val);
+            disableSubsequent('rate_type');
           } else {
+            clearSelect('#season_definition_id');
             disableSubsequent('rate_type');
           }
           updateButton();
         });
 
-        $('select[name="season_definition_id"]').on('change', function() {
+        $('#season_definition_id').on('change', function() {
           var val = $(this).val();
           if (val) {
-            $('select[name="season_id"]').prop('disabled', false).trigger('change.select2');
+            loadSeasons(val);
+            disableSubsequent('season_definition_id');
           } else {
+            clearSelect('#season_id');
             disableSubsequent('season_definition_id');
           }
           updateButton();
         });
 
-        $('select[name="season_id"]').on('change', function() {
+        $('#season_id').on('change', function() {
           var val = $(this).val();
-          if (val) {
-            $('select[name="season_duration"]').prop('disabled', false).trigger('change.select2');
+          if (val !== '') {
+            $('#season_duration').prop('disabled', false).trigger('change.select2');
           } else {
-            disableSubsequent('season_id');
+            $('#season_duration').prop('disabled', true).trigger('change.select2');
           }
           updateButton();
         });
 
-        $('select[name="season_duration"]').on('change', function() {
+        $('#season_duration').on('change', function() {
           updateButton();
         });
 
+        $('#filter_button').on('click', function(e) {
+          e.preventDefault();
+          loadPrices();
+        });
+
+        function loadRentalLocations() {
+          $.get('/api/rental_locations', function(data) {
+            populateSelect('#rental_location', data);
+          });
+        }
+
+        function loadRateTypes(rentalLocationId) {
+          $.get('/api/rate_types', { rental_location_id: rentalLocationId }, function(data) {
+            populateSelect('#rate_type', data);
+            $('#rate_type').prop('disabled', false).trigger('change.select2');
+          });
+        }
+
+        function loadSeasonDefinitions(rentalLocationId, rateTypeId) {
+          $.get('/api/season_definitions', { rental_location_id: rentalLocationId, rate_type_id: rateTypeId }, function(data) {
+            populateSelect('#season_definition_id', data);
+            $('#season_definition_id').prop('disabled', false).trigger('change.select2');
+          });
+        }
+
+        function loadSeasons(seasonDefinitionId) {
+          $.get('/api/seasons', { season_definition_id: seasonDefinitionId }, function(data) {
+            populateSelect('#season_id', data, true); // true to include "Sin temporadas"
+            $('#season_id').prop('disabled', false).trigger('change.select2');
+          });
+        }
+
+        function loadPrices() {
+          var params = {
+            rental_location_id: $('#rental_location').val(),
+            rate_type_id: $('#rate_type').val(),
+            season_definition_id: $('#season_definition_id').val(),
+            season_id: $('#season_id').val(),
+            duration: $('#season_duration').val()
+          };
+
+          $.get('/api/prices', params, function(data) {
+            updateTable(data);
+          }).fail(function(jqXHR, textStatus, errorThrown) {
+            alert('Error al cargar los precios: ' + textStatus);
+          });
+        }
+
+        function populateSelect(selector, data, includeNoSeason = false) {
+          var $select = $(selector);
+          $select.empty();
+          $select.append('<option value="">Seleccione...</option>');
+          if (includeNoSeason) {
+            $select.append('<option value="0">Sin temporadas</option>');
+          }
+          data.forEach(function(item) {
+            $select.append('<option value="' + item.id + '">' + item.name + '</option>');
+          });
+        }
+
+        function clearSelect(selector) {
+          var $select = $(selector);
+          $select.empty();
+          $select.append('<option value="">Seleccione...</option>');
+          $select.prop('disabled', true).trigger('change.select2');
+        }
+
+        function disableSubsequent(from) {
+          if (from === 'rental_location') {
+            clearSelect('#rate_type');
+            clearSelect('#season_definition_id');
+            clearSelect('#season_id');
+            $('#season_duration').prop('disabled', true).trigger('change.select2');
+          } else if (from === 'rate_type') {
+            clearSelect('#season_definition_id');
+            clearSelect('#season_id');
+            $('#season_duration').prop('disabled', true).trigger('change.select2');
+          } else if (from === 'season_definition_id') {
+            clearSelect('#season_id');
+            $('#season_duration').prop('disabled', true).trigger('change.select2');
+          } else if (from === 'season_id') {
+            $('#season_duration').prop('disabled', true).trigger('change.select2');
+          }
+        }
+
         function updateButton() {
-          var disabled = $('select[name="rental_location"]').is(':disabled') ||
-                          $('select[name="rate_type"]').is(':disabled') ||
-                          $('select[name="season_definition_id"]').is(':disabled') ||
-                          $('select[name="season_id"]').is(':disabled') ||
-                          $('select[name="season_duration"]').is(':disabled') ||
-                          $('select[name="season_duration"]').val() === '';
-          $('button:contains("Filtrar")').prop('disabled', disabled);
+          var disabled = $('#rental_location').val() === '' ||
+                          $('#rate_type').val() === '' ||
+                          $('#season_definition_id').val() === '' ||
+                          $('#season_id').val() === '' ||
+                          $('#season_duration').val() === '';
+          $('#filter_button').prop('disabled', disabled);
+        }
+
+        function updateTable(data) {
+          // Check if table elements exist
+          var $header = $('#table_header');
+          var $body = $('#table_body');
+
+          if ($header.length === 0 || $body.length === 0) {
+            return;
+          }
+
+          // Destroy existing DataTable (this resets it to original state)
+          if ($.fn.DataTable.isDataTable('#prices_table')) {
+            $('#prices_table').DataTable().destroy();
+            // Remove the manual emptying here to avoid interference
+          }
+
+          // Explicitly empty the header and body before repopulating
+          $header.empty();
+          $body.empty();
+
+          // Update header
+          $header.append('<th scope="col">Código Categoría</th><th scope="col">Nombre Categoría</th><th scope="col">Sucursal</th><th scope="col">Tipo de Tarifa</th><th scope="col">Temporada</th><th scope="col">Medida de Tiempo</th><th scope="col">Unidades</th><th scope="col">Precio</th><th scope="col">KM Incluidos</th><th scope="col">Precio Extra KM</th><th scope="col">Depósito</th><th scope="col">Exceso</th><th scope="col">ID Definición Precio</th><th scope="col">ID Precio</th>');
+
+          // Update body
+          if (data.prices && data.prices.length > 0) {
+            data.prices.forEach(function(price) {
+              var row = '<tr>' +
+                '<td>' + price.category_code + '</td>' +
+                '<td>' + price.category_name + '</td>' +
+                '<td>' + price.rental_location_name + '</td>' +
+                '<td>' + price.rate_type_name + '</td>' +
+                '<td>' + price.season_name + '</td>' +
+                '<td>' + price.time_measurement + '</td>' +
+                '<td>' + price.units + '</td>' +
+                '<td class="text-right">' + price.price + '</td>' +
+                '<td>' + price.included_km + '</td>' +
+                '<td>' + price.extra_km_price + '</td>' +
+                '<td>' + price.deposit + '</td>' +
+                '<td>' + price.excess + '</td>' +
+                '<td>' + price.price_definition_id + '</td>' +
+                '<td>' + price.price_id + '</td>' +
+                '</tr>';
+              $body.append(row);
+            });
+
+            // Initialize DataTable AFTER content is added
+            try {
+              $('#prices_table').DataTable({
+                paging: true,
+                searching: false,
+                info: true,
+                destroy: true,
+                autoWidth: false
+              });
+            } catch (error) {
+              // Fallback to plain table if DataTable fails
+              $('#prices_table').addClass('table table-striped');
+            }
+          } else {
+            var colspan = 14;
+            $body.append('<tr><td colspan="' + colspan + '" class="text-center">No hay datos disponibles</td></tr>');
+          }
         }
 
         updateButton();
-
       });
     </script>
