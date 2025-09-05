@@ -52,6 +52,16 @@ module Controller
         end
 
         #
+        # Get durations - static list
+        #
+        app.get '/api/durations' do
+          service = Service::ListDurationsService.new
+          data = service.retrieve
+          content_type :json
+          data.to_json
+        end
+
+        #
         # Get prices
         #
         app.get '/api/prices' do

@@ -19,13 +19,7 @@ module UseCase
           return Result.new(success?: false, authorized?: true, message: 'All parameters are required')
         end
 
-        time_measurement = case duration
-                          when 'month' then 0
-                          when 'days' then 2
-                          when 'hours' then 1
-                          when 'minutes' then 3
-                          else nil
-                          end
+        time_measurement = duration.to_i
 
         actual_prices = Service::ListActualPricesService.new.retrieve(
           rental_location_id: rental_location_id,

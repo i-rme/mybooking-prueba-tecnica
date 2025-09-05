@@ -33,10 +33,6 @@
               <label for="season_duration" class="form-label">Duración</label>
               <select name="season_duration" class="form-select" id="season_duration" disabled>
                 <option value="">Seleccione duración</option>
-                <option value="month">Meses</option>
-                <option value="days">Días</option>
-                <option value="hours">Horas</option>
-                <option value="minutes">Minutos</option>
               </select>
             </div>
             <div class="col-md-1">
@@ -99,7 +95,7 @@
         $('#season_id').select2({ theme: 'bootstrap-5' });
         $('#season_duration').select2({ theme: 'bootstrap-5' });
 
-        // Load initial rental locations
+        // Load initial data
         loadRentalLocations();
 
         // Event handlers
@@ -143,8 +139,10 @@
         $('#season_id').on('change', function() {
           var val = $(this).val();
           if (val !== '') {
+            loadDurations();
             $('#season_duration').prop('disabled', false).trigger('change.select2');
           } else {
+            clearSelect('#season_duration');
             $('#season_duration').prop('disabled', true).trigger('change.select2');
           }
           updateButton();
@@ -162,6 +160,13 @@
         function loadRentalLocations() {
           $.get('/api/rental_locations', function(data) {
             populateSelect('#rental_location', data);
+          });
+        }
+
+        function loadDurations() {
+          $.get('/api/durations', function(data) {
+            populateSelect('#season_duration', data);
+            $('#season_duration').prop('disabled', false).trigger('change.select2');
           });
         }
 
@@ -226,16 +231,16 @@
             clearSelect('#rate_type');
             clearSelect('#season_definition_id');
             clearSelect('#season_id');
-            $('#season_duration').prop('disabled', true).trigger('change.select2');
+            clearSelect('#season_duration');
           } else if (from === 'rate_type') {
             clearSelect('#season_definition_id');
             clearSelect('#season_id');
-            $('#season_duration').prop('disabled', true).trigger('change.select2');
+            clearSelect('#season_duration');
           } else if (from === 'season_definition_id') {
             clearSelect('#season_id');
-            $('#season_duration').prop('disabled', true).trigger('change.select2');
+            clearSelect('#season_duration');
           } else if (from === 'season_id') {
-            $('#season_duration').prop('disabled', true).trigger('change.select2');
+            clearSelect('#season_duration');
           }
         }
 
