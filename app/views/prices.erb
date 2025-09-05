@@ -119,7 +119,7 @@
           var rentalLocationVal = $('#rental_location').val();
           var val = $(this).val();
           if (val && rentalLocationVal) {
-            loadSeasonDefinitions(rentalLocationVal, val);
+            loadSeasonDefinitions(rentalLocationVal);
             disableSubsequent('rate_type');
           } else {
             clearSelect('#season_definition_id');
@@ -172,8 +172,8 @@
           });
         }
 
-        function loadSeasonDefinitions(rentalLocationId, rateTypeId) {
-          $.get('/api/season_definitions', { rental_location_id: rentalLocationId, rate_type_id: rateTypeId }, function(data) {
+        function loadSeasonDefinitions(rentalLocationId) {
+          $.get('/api/season_definitions', { rental_location_id: rentalLocationId }, function(data) {
             populateSelect('#season_definition_id', data);
             $('#season_definition_id').prop('disabled', false).trigger('change.select2');
           });
