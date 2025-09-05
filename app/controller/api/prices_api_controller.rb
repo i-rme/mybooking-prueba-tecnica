@@ -47,8 +47,13 @@ module Controller
         app.get '/api/seasons' do
           service = Service::ListSeasonsService.new
           data = service.retrieve(params[:season_definition_id])
+          
+          # Add "Sin temporadas" option with id 0
+          seasons_with_default = [{ id: 0, name: "Sin temporadas", season_definition_id: nil }]
+          seasons_with_default += data.map { |s| { id: s.id, name: s.name, season_definition_id: s.season_definition_id } }
+          
           content_type :json
-          data.map { |s| { id: s.id, name: s.name, season_definition_id: s.season_definition_id } }.to_json
+          seasons_with_default.to_json
         end
 
         #

@@ -26,7 +26,6 @@
               <label for="season_id" class="form-label">Temporada</label>
                 <select name="season_id" class="form-select" id="season_id" disabled>
                 <option value="">Seleccione temporada</option>
-                <option value="0">Sin temporadas</option>
               </select>
             </div>
             <div class="col-md-2">
@@ -186,7 +185,7 @@
 
         function loadSeasons(seasonDefinitionId) {
           $.get('/api/seasons', { season_definition_id: seasonDefinitionId }, function(data) {
-            populateSelect('#season_id', data, true); // true to include "Sin temporadas"
+            populateSelect('#season_id', data);
             $('#season_id').prop('disabled', false).trigger('change.select2');
           });
         }
@@ -207,13 +206,10 @@
           });
         }
 
-        function populateSelect(selector, data, includeNoSeason = false) {
+        function populateSelect(selector, data) {
           var $select = $(selector);
           $select.empty();
           $select.append('<option value="">Seleccione...</option>');
-          if (includeNoSeason) {
-            $select.append('<option value="0">Sin temporadas</option>');
-          }
           data.forEach(function(item) {
             $select.append('<option value="' + item.id + '">' + item.name + '</option>');
           });
