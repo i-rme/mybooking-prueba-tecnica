@@ -42,11 +42,11 @@ module Controller
         end
 
         #
-        # Get seasons - return all seasons as the filtering logic is handled in frontend
+        # Get seasons - filtered by season definition if provided
         #
         app.get '/api/seasons' do
           service = Service::ListSeasonsService.new
-          data = service.retrieve
+          data = service.retrieve(params[:season_definition_id])
           content_type :json
           data.map { |s| { id: s.id, name: s.name, season_definition_id: s.season_definition_id } }.to_json
         end
