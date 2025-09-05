@@ -22,11 +22,11 @@ module Controller
         end
 
         #
-        # Get rate types - no filtering needed as rate types are global
+        # Get rate types - filtered by rental location if provided
         #
         app.get '/api/rate_types' do
           service = Service::ListRateTypesService.new
-          data = service.retrieve
+          data = service.retrieve(params[:rental_location_id])
           content_type :json
           data.map { |rt| { id: rt.id, name: rt.name } }.to_json
         end
