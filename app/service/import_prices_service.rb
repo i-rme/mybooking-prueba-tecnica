@@ -1,3 +1,5 @@
+require 'csv'
+
 module Service
   class ImportPricesService
 
@@ -26,48 +28,77 @@ module Service
     private
 
     def process_row(row)
-      category_id = row['category_id'].to_i
-      rental_location_id = row['rental_location_id'].to_i
-      rate_type_id = row['rate_type_id'].to_i
-      season_id = row['season_id'] && !row['season_id'].empty? ? row['season_id'].to_i : nil
-      time_measurement = case row['time_measurement'].to_i
+      rental_location_id = row['rental_location'].to_i
+      rate_type_id = row['rate_type'].to_i
+      season_definition_id = row['season_definition'].to_i
+      time_measurement_int = row['time_measurement'].to_i
+      units = row['units'].to_i
+      price_value = row['price'].to_f
+      included_km = row['included_km'].to_i
+      extra_km_price = row['extra_km_price'].to_f
+      price_definition_id = row['price_definition_id'].to_i
+      season_id = row['season_id'].to_i
+      season_id = nil if season_id == 0
+
+      # Convert time_measurement integer to symbol for DataMapper
+      time_measurement = case time_measurement_int
                          when 1 then :months
                          when 2 then :days
                          when 3 then :hours
                          when 4 then :minutes
                          else :days
                          end
-      units = row['units'].to_i
-      price_value = row['price'].to_f
-      included_km = row['included_km'].to_i
-      extra_km_price = row['extra_km_price'].to_f
 
-      # Find category_rental_location_rate_type
-      crlrt = @crlrt_repo.find_all(conditions: { category_id: category_id, rental_location_id: rental_location_id, rate_type_id: rate_type_id }).first
-      raise "CategoryRentalLocationRateType not found" unless crlrt
-
-      price_definition_id = crlrt.price_definition_id
-
-      # Get price_definition to validate units
+      # Validate that price_definition_id exists
       pd = @price_definition_repo.find_by_id(price_definition_id)
-      raise "PriceDefinition not found" unless pd
+      raise "PriceDefinition with id #{price_definition_id} not found" unless pd
 
-      # Assuming time_measurement 2 (days), check units_management_value_days_list
-      if time_measurement == 2
-        allowed_units = pd.units_management_value_days_list.split(',').map(&:to_i)
-        raise "Units #{units} not allowed for this price definition" unless allowed_units.include?(units)
+      # Validate units based on time_measurement and price_definition configuration
+      case time_measurement_int
+      when 1 # months
+        if pd.units_management_value_months_list
+          allowed_units = pd.units_management_value_months_list.split(',').map(&:to_i)
+          raise "Units #{units} not allowed for months in price definition #{price_definition_id}" unless allowed_units.include?(units)
+        end
+      when 2 # days
+        if pd.units_management_value_days_list
+          allowed_units = pd.units_management_value_days_list.split(',').map(&:to_i)
+          raise "Units #{units} not allowed for days in price definition #{price_definition_id}" unless allowed_units.include?(units)
+        end
+      when 3 # hours
+        if pd.units_management_value_hours_list
+          allowed_units = pd.units_management_value_hours_list.split(',').map(&:to_i)
+          raise "Units #{units} not allowed for hours in price definition #{price_definition_id}" unless allowed_units.include?(units)
+        end
+      when 4 # minutes
+        if pd.units_management_value_minutes_list
+          allowed_units = pd.units_management_value_minutes_list.split(',').map(&:to_i)
+          raise "Units #{units} not allowed for minutes in price definition #{price_definition_id}" unless allowed_units.include?(units)
+        end
+      else
+        raise "Invalid time_measurement: #{time_measurement_int}"
       end
 
       # Find or create Price
-      existing_price = @price_repo.find_all(conditions: { price_definition_id: price_definition_id, season_id: season_id, time_measurement: time_measurement, units: units }).first
+      existing_price = @price_repo.find_all(conditions: { 
+        price_definition_id: price_definition_id, 
+        season_id: season_id, 
+        time_measurement: time_measurement, 
+        units: units 
+      }).first
 
       if existing_price
+        # Update existing price
         existing_price.price = price_value
         existing_price.included_km = included_km
         existing_price.extra_km_price = extra_km_price
-        existing_price.time_measurement = time_measurement
-        @price_repo.save(existing_price)
+        result = @price_repo.save(existing_price)
+        unless result
+          raise "Failed to update price: #{existing_price.errors.full_messages.join(', ')}" if existing_price.respond_to?(:errors) && existing_price.errors.any?
+          raise "Model::Price#save returned false, Model::Price was not saved"
+        end
       else
+        # Create new price
         new_price = Model::Price.new(
           price_definition_id: price_definition_id,
           season_id: season_id,
@@ -77,7 +108,11 @@ module Service
           included_km: included_km,
           extra_km_price: extra_km_price
         )
-        @price_repo.save(new_price)
+        result = @price_repo.save(new_price)
+        unless result
+          raise "Failed to create price: #{new_price.errors.full_messages.join(', ')}" if new_price.respond_to?(:errors) && new_price.errors.any?
+          raise "Model::Price#save returned false, Model::Price was not saved"
+        end
       end
     end
   end

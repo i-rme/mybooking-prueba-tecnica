@@ -1,0 +1,3 @@
+rental_location,rate_type,season_definition,time_measurement,units,price,included_km,extra_km_price,price_definition_id,season_id
+1,1,1,1,1,42,100,21,7,0
+2,1,1,1,1,42,100,21,7,0

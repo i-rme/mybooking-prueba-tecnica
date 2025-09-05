@@ -25,6 +25,6 @@
 ## Tarea 2
 - Endpoint /api/import-prices que acepta multipart upload
 
-
-## TODO
-- Importacion
+### Decisiones de diseño
+- Q: ¿Planterías la importación siguiendo estos filtros o añadirías las columnas de sucursal, tipo de tarifa y temporada?
+- A: Bajo mi criterio, la importación debería no seguir los filtros seleccionados, ya que, por ejemplo si no hay precios para un tipo de tarifa no aparecerá en el desplegable por lo que no se podrá realizar la importación. Lo correcto sería añadir las columnas de sucursal, tipo de tarifa y temporada.
