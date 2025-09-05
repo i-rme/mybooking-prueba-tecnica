@@ -32,11 +32,11 @@ module Controller
         end
 
         #
-        # Get season definitions - filtered by rental location if provided
+        # Get season definitions - filtered by rental location and rate_type if provided
         #
         app.get '/api/season_definitions' do
           service = Service::ListSeasonDefinitionsService.new
-          data = service.retrieve(params[:rental_location_id])
+          data = service.retrieve(params[:rental_location_id], params[:rate_type_id])
           content_type :json
           data.map { |sd| { id: sd.id, name: sd.name } }.to_json
         end
