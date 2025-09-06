@@ -38,14 +38,14 @@ WHERE rl.id = ? -- rental_location_id
          AND pd.season_definition_id IS NULL
          AND (p.season_id IS NULL OR CAST(? AS UNSIGNED)=0)) -- season_id
 
-        -- CON temporada (si season_id=0, trae TODAS; acepta pd.sd_id NULL si la season del precio pertenece al conjunto)
-        OR (CAST(? AS UNSIGNED)<>0 -- season_definition_id
-            AND COALESCE(pd.season_definition_id, s.season_definition_id) = CAST(? AS UNSIGNED) -- season_definition_id
-            AND (CAST(? AS UNSIGNED)=0 OR p.season_id = CAST(? AS UNSIGNED)) -- season_id, season_id
-            AND sdrl.id IS NOT NULL) -- el conjunto de temporadas aplica en la sucursal
-      )
-  AND p.time_measurement = ? -- time_measurement
-ORDER BY c.code, COALESCE(s.name,'ZZZ'), p.units;
+       -- CON temporada (si season_id=0, trae TODAS; acepta pd.sd_id NULL si la season del precio pertenece al conjunto)
+                OR (CAST(? AS INTEGER)<>0 -- season_definition_id
+                    AND COALESCE(pd.season_definition_id, s.season_definition_id) = CAST(? AS INTEGER) -- season_definition_id
+                    AND (CAST(? AS INTEGER)=0 OR p.season_id = CAST(? AS INTEGER)) -- season_id, season_id
+                    AND sdrl.id IS NOT NULL) -- el conjunto de temporadas aplica en la sucursal
+              )
+          AND p.time_measurement = ? -- time_measurement
+        ORDER BY c.code, COALESCE(s.name,'ZZZ'), p.units;
       SQL
 
       args = [rental_location_id, rate_type_id,
