@@ -1,8 +1,5 @@
 # Solución
 
-## Introducción
-- 
-
 ## Tarea 1
 - Resultado accesible en /prices
 - Se implementa en forma de API REST de modo que /prices cargue dinamicamente con JavaScript los criterios de filtrado adecuados
@@ -10,6 +7,7 @@
 - Endpoint /api/rate_types
 - Endpoint /api/season_definitions
 - Endpoint /api/seasons
+- Endpoint /api/durations
 - Endpoint /prices
 
 ### Decisiones de diseño
